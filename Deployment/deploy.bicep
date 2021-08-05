@@ -44,6 +44,9 @@ resource rewardsapicustomer 'Microsoft.ApiManagement/service/apis@2021-01-01-pre
     description: 'This is a rewards api to award points and lookup points'
     apiVersionSetId: rewardsset.id
     path: '/'
+    protocols: [
+      'https'
+    ]
   }
 }
 
