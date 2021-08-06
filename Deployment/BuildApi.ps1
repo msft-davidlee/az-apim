@@ -8,11 +8,12 @@ if (!$serviceName) {
     throw "Service name cannot be empty!"
 }
 
+Write-Host "Service name $serviceName"
 $ApiMgmtContext = New-AzApiManagementContext -ResourceGroupName $rgName -ServiceName $serviceName
 
-$customerService = "CustomerServiceRewardsAPI"
-$apiList = Get-AzApiManagementApi -Context $ApiMgmtContext -Name $customerService
+$apiList = Get-AzApiManagementApi -Context $ApiMgmtContext
 
+$customerService = "CustomerServiceRewardsAPI"
 $customerServiceApiFound = $apiList | Where-Object { $_.Name -eq $customerService }
 
 if (!$customerServiceApiFound) {
