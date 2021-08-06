@@ -64,4 +64,4 @@ $Policy = @"
 </policies>
 "@
 
-Set-AzApiManagementPolicy -Context $apimContext -ApiId $RewardId -Policy $Policy
+Set-AzApiManagementPolicy -Context $ApiMgmtContext -ApiId $RewardId -Policy $Policy
