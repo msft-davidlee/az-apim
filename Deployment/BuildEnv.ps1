@@ -43,5 +43,5 @@ if (!$customerServiceApiFound) {
     $Response.StatusCode = 204
     $Response.Representations = @($ResponseRepresentation)
     
-    New-AzApiManagementOperation -Context $ApiMgmtContext -ApiId "" -OperationId "61234567890" -Name 'Lookup reward points' -Method 'GET' -UrlTemplate '/rewards/{memberId}/points' -Description "Use this operation to lookup rewards points." -TemplateParameters @($MemberId) -Responses @($Response)
+    New-AzApiManagementOperation -Context $ApiMgmtContext -ApiId "LookupRewardPoints" -OperationId "61234567890" -Name 'Lookup reward points' -Method 'GET' -UrlTemplate '/rewards/{memberId}/points' -Description "Use this operation to lookup rewards points." -TemplateParameters @($MemberId) -Responses @($Response)
 }
