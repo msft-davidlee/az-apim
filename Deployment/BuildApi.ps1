@@ -1,4 +1,13 @@
 param([string]$rgName, [string]$serviceName)
+
+if (!$rgName) {
+    throw "RG cannot be empty!"
+}
+
+if (!$serviceName) {
+    throw "Service name cannot be empty!"
+}
+
 $ApiMgmtContext = New-AzApiManagementContext -ResourceGroupName $rgName -ServiceName $serviceName
 $apiList = Get-AzApiManagementApi -Context $ApiMgmtContext
 
