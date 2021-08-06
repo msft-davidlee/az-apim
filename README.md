@@ -19,7 +19,7 @@ To create this APIM environment in your Azure subscription, please follow the st
 | Name | Comments |
 | --- | --- |
 | AZURE_CREDENTIALS | <pre>{<br/>&nbsp;&nbsp;&nbsp;&nbsp;"clientId": "",<br/>&nbsp;&nbsp;&nbsp;&nbsp;"clientSecret": "", <br/>&nbsp;&nbsp;&nbsp;&nbsp;"subscriptionId": "",<br/>&nbsp;&nbsp;&nbsp;&nbsp;"tenantId": "" <br/>}</pre> |
-| PREFIX | myaks - or whatever name you would like for all your resources such as AKS, ACR etc |
+| PREFIX | myapim - or whatever name you would like for all your resources |
 | RESOURCE_GROUP | apim - or whatever name you give to the resource group |
 | PUBLISHER_EMAIL | your email address |
 | PUBLISHER_NAME | your name |
