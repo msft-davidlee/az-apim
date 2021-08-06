@@ -8,7 +8,6 @@ if (!$serviceName) {
     throw "Service name cannot be empty!"
 }
 
-Write-Host "Service name $serviceName"
 $ApiMgmtContext = New-AzApiManagementContext -ResourceGroupName $rgName -ServiceName $serviceName
 
 $apiList = Get-AzApiManagementApi -Context $ApiMgmtContext
@@ -17,7 +16,7 @@ $customerService = "CustomerServiceRewardsAPI"
 $customerServiceApiFound = $apiList | Where-Object { $_.Name -eq $customerService }
 
 if (!$customerServiceApiFound) {
-    New-AzApiManagementApi -Context $ApiMgmtContext -Name $customerService -Protocols @("https") -Path "rewards"
+    New-AzApiManagementApi -Context $ApiMgmtContext -Name $customerService -Protocols @("https") -Path "rewards" -ServiceUrl "https://contoso"
     
     $MemberId = New-Object -TypeName Microsoft.Azure.Commands.ApiManagement.ServiceManagement.Models.PsApiManagementParameter
     $MemberId.Name = "MemberId"
