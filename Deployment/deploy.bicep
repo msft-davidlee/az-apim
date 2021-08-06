@@ -64,6 +64,9 @@ resource rewardsapicustomerschema 'Microsoft.ApiManagement/service/apis/schemas@
 resource rewardsapicustomerops 'Microsoft.ApiManagement/service/apis/operations@2021-01-01-preview' = {
   name: 'customer'
   parent: rewardsapicustomer
+  dependsOn: [
+    rewardsapicustomerschema
+  ]
   properties: {
     displayName: 'Customer'
     method: 'GET'
