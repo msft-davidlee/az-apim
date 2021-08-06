@@ -34,7 +34,7 @@ if (!$ApiFound) {
     $ResponseRepresentation.Sample = '{ "points": [ { "value":100, "effective":"2021-08-01",  "expires":"2021-08-31" } ] }'
 
     $Response = New-Object -TypeName Microsoft.Azure.Commands.ApiManagement.ServiceManagement.Models.PsApiManagementResponse
-    $Response.StatusCode = 204
+    $Response.StatusCode = 200
     $Response.Representations = @($ResponseRepresentation)
     
     New-AzApiManagementOperation -Context $ApiMgmtContext -ApiId $RewardId -OperationId "61234567890" `
@@ -45,3 +45,23 @@ if (!$ApiFound) {
         -TemplateParameters @($MemberIdParam, $YearParam) `
         -Responses @($Response)
 }
+
+$Policy = @"
+<policies>
+    <inbound>
+        <mock-response status-code="200" content-type="application/json" />
+        <base />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
+"@
+
+Set-AzApiManagementPolicy -Context $apimContext -ApiId $RewardId -Policy $Policy
