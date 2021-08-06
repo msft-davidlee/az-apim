@@ -9,9 +9,10 @@ if (!$serviceName) {
 }
 
 $ApiMgmtContext = New-AzApiManagementContext -ResourceGroupName $rgName -ServiceName $serviceName
-$apiList = Get-AzApiManagementApi -Context $ApiMgmtContext
 
-$customerService = "Customer Service Rewards API"
+$customerService = "CustomerServiceRewardsAPI"
+$apiList = Get-AzApiManagementApi -Context $ApiMgmtContext -Name $customerService
+
 $customerServiceApiFound = $apiList | Where-Object { $_.Name -eq $customerService }
 
 if (!$customerServiceApiFound) {
