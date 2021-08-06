@@ -50,6 +50,17 @@ resource rewardsapicustomer 'Microsoft.ApiManagement/service/apis@2021-01-01-pre
   }
 }
 
+var schemaId = '1628259663928'
+
+resource rewardsapicustomerschema 'Microsoft.ApiManagement/service/apis/schemas@2021-01-01-preview' = {
+  name: schemaId
+  parent: rewardsapicustomer
+  properties: {
+    contentType: 'application/vnd.oai.openapi.components+json'
+    document: {}
+  }
+}
+
 resource rewardsapicustomerops 'Microsoft.ApiManagement/service/apis/operations@2021-01-01-preview' = {
   name: 'customer'
   parent: rewardsapicustomer
@@ -62,6 +73,7 @@ resource rewardsapicustomerops 'Microsoft.ApiManagement/service/apis/operations@
         name: 'cardnumber'
         required: true
         type: 'string'
+        schemaId: schemaId
       }
     ]
     responses: [
