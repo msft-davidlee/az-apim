@@ -12,16 +12,22 @@ $ApiMgmtContext = New-AzApiManagementContext -ResourceGroupName $rgName -Service
 
 $apiList = Get-AzApiManagementApi -Context $ApiMgmtContext
 
-$customerService = "CustomerServiceRewardsAPI"
-$customerServiceApiFound = $apiList | Where-Object { $_.Name -eq $customerService }
+$RewardsName = "Rewards API"
+$RewardId = "rewards-api"
+$ApiFound = $apiList | Where-Object { $_.Name -eq $RewardsName }
 
-if (!$customerServiceApiFound) {
-    New-AzApiManagementApi -Context $ApiMgmtContext -Name $customerService -Protocols @("https") -Path "rewards" -ServiceUrl "https://contoso"
+if (!$ApiFound) {
+    New-AzApiManagementApi -Context $ApiMgmtContext -ApiId $RewardId -Name $RewardsName -Protocols @("https") -Path "rewards" -ServiceUrl "https://contoso"
     
-    $MemberId = New-Object -TypeName Microsoft.Azure.Commands.ApiManagement.ServiceManagement.Models.PsApiManagementParameter
-    $MemberId.Name = "MemberId"
-    $MemberId.Description = "Member Id"
-    $MemberId.Type = "string"
+    $MemberIdParam = New-Object -TypeName Microsoft.Azure.Commands.ApiManagement.ServiceManagement.Models.PsApiManagementParameter
+    $MemberIdParam.Name = "memberId"
+    $MemberIdParam.Description = "Member Id"
+    $MemberIdParam.Type = "string"
+
+    $YearParam = New-Object -TypeName Microsoft.Azure.Commands.ApiManagement.ServiceManagement.Models.PsApiManagementParameter
+    $YearParam.Name = "year"
+    $YearParam.Description = "Year"
+    $YearParam.Type = "integer"
 
     $ResponseRepresentation = New-Object -TypeName Microsoft.Azure.Commands.ApiManagement.ServiceManagement.Models.PsApiManagementRepresentation
     $ResponseRepresentation.ContentType = 'application/json'
@@ -31,5 +37,11 @@ if (!$customerServiceApiFound) {
     $Response.StatusCode = 204
     $Response.Representations = @($ResponseRepresentation)
     
-    New-AzApiManagementOperation -Context $ApiMgmtContext -ApiId "LookupRewardPoints" -OperationId "61234567890" -Name 'Lookup reward points' -Method 'GET' -UrlTemplate '/rewards/{memberId}/points' -Description "Use this operation to lookup rewards points." -TemplateParameters @($MemberId) -Responses @($Response)
+    New-AzApiManagementOperation -Context $ApiMgmtContext -ApiId $RewardId -OperationId "61234567890" `
+        -Name 'Lookup reward points' `
+        -Method 'GET' `
+        -UrlTemplate '/rewards/{memberId}/points/year/{year}' `
+        -Description "Use this operation to lookup rewards points." `
+        -TemplateParameters @($MemberIdParam, $YearParam) `
+        -Responses @($Response)
 }
