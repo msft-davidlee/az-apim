@@ -13,6 +13,7 @@ To create this APIM environment in your Azure subscription, please follow the st
 4. In your github organization for your project, create two environments, and named them dev and prod respectively.
 5. Create the following secrets in your github per environment. Be sure to populate with your desired values. The values below are all suggestions.
 6. Note that the environment suffix of dev or prod will be appened to your resource group but you will have the option to define your own resource prefix.
+7. Create a Managed user with this convention apim<environment>user and assign with Contributor role. This is needed to run the deployment script.
 
 ## Secrets
 | Name | Comments |
