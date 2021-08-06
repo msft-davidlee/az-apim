@@ -14,6 +14,7 @@ $apiList = Get-AzApiManagementApi -Context $ApiMgmtContext
 
 $RewardsName = "Rewards API"
 $RewardId = "rewards-api"
+$RewardPointsLookupByYearId = "rewards-points-lookup-by-year"
 $ApiFound = $apiList | Where-Object { $_.Name -eq $RewardsName }
 
 if (!$ApiFound) {
@@ -37,16 +38,15 @@ if (!$ApiFound) {
     $Response.StatusCode = 200
     $Response.Representations = @($ResponseRepresentation)
     
-    New-AzApiManagementOperation -Context $ApiMgmtContext -ApiId $RewardId -OperationId "61234567890" `
+    New-AzApiManagementOperation -Context $ApiMgmtContext -ApiId $RewardId -OperationId $RewardPointsLookupByYearId `
         -Name 'Lookup reward points' `
         -Method 'GET' `
         -UrlTemplate '/rewards/{memberId}/points/year/{year}' `
         -Description "Use this operation to lookup rewards points." `
         -TemplateParameters @($MemberIdParam, $YearParam) `
         -Responses @($Response)
-}
 
-$Policy = @"
+    $Policy = @"
 <policies>
     <inbound>
         <mock-response status-code="200" content-type="application/json" />
@@ -64,4 +64,5 @@ $Policy = @"
 </policies>
 "@
 
-Set-AzApiManagementPolicy -Context $ApiMgmtContext -ApiId $RewardId -Policy $Policy
+    Set-AzApiManagementPolicy -Context $ApiMgmtContext -ApiId $RewardId -Policy $Policy -OperationId $RewardPointsLookupByYearId
+}
