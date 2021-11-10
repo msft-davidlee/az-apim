@@ -18,7 +18,7 @@ $RewardPointsLookupByYearId = "rewards-points-lookup-by-year"
 $ApiFound = $apiList | Where-Object { $_.Name -eq $RewardsName }
 
 if (!$ApiFound) {
-    New-AzApiManagementApi -Context $ApiMgmtContext -ApiId $RewardId -Name $RewardsName -Protocols @("https") -Path "rewards" -ServiceUrl "https://contoso"
+    New-AzApiManagementApi -Context $ApiMgmtContext -ApiId $RewardId -Name $RewardsName -Protocols @("https", "http") -Path "rewards" -ServiceUrl "https://contoso"
     
     $MemberIdParam = New-Object -TypeName Microsoft.Azure.Commands.ApiManagement.ServiceManagement.Models.PsApiManagementParameter
     $MemberIdParam.Name = "memberId"
@@ -41,7 +41,7 @@ if (!$ApiFound) {
     New-AzApiManagementOperation -Context $ApiMgmtContext -ApiId $RewardId -OperationId $RewardPointsLookupByYearId `
         -Name 'Lookup reward points' `
         -Method 'GET' `
-        -UrlTemplate '/rewards/{memberId}/points/year/{year}' `
+        -UrlTemplate '/{memberId}/points/year/{year}' `
         -Description "Use this operation to lookup rewards points." `
         -TemplateParameters @($MemberIdParam, $YearParam) `
         -Responses @($Response)
