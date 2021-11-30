@@ -23,3 +23,11 @@ To create this APIM environment in your Azure subscription, please follow the st
 | RESOURCE_GROUP | apim - or whatever name you give to the resource group |
 | PUBLISHER_EMAIL | your email address |
 | PUBLISHER_NAME | your name |
+
+# Demo
+
+## DevOps - Migrate
+Shows how we can migrate API changes from an existing APIM instance to a another (could be new or existing) i.e. from Dev to Prod.
+
+1. Clone the following repo: https://github.com/Azure/azure-api-management-devops-resource-kit.git
+2. 

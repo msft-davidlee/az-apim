@@ -1,0 +1,10 @@
+{
+    "sourceApimName": "dleems02dev",
+    "destinationApimName": "dleems02prod",
+    "resourceGroup": "apim-dev",
+    "fileFolder": "C:\\dev\\az-apim\\Migration",
+    "apiName": "rewards-api",
+    "linkedTemplatesBaseUrl": "",
+    "paramNamedValue": "false",
+    "paramLogResourceId": "false"
+}

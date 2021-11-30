@@ -1,0 +1,107 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ApimServiceName": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "properties": {
+        "authenticationSettings": {
+          "subscriptionKeyRequired": false
+        },
+        "subscriptionKeyParameterNames": {
+          "header": "Ocp-Apim-Subscription-Key",
+          "query": "subscription-key"
+        },
+        "apiRevision": "1",
+        "isCurrent": true,
+        "subscriptionRequired": true,
+        "displayName": "Rewards API",
+        "serviceUrl": "https://contoso",
+        "path": "rewards",
+        "protocols": [
+          "http",
+          "https"
+        ]
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/rewards-api')]",
+      "type": "Microsoft.ApiManagement/service/apis",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": []
+    },
+    {
+      "properties": {
+        "templateParameters": [
+          {
+            "name": "memberId",
+            "description": "Member Id",
+            "type": "string",
+            "required": true,
+            "values": []
+          },
+          {
+            "name": "year",
+            "description": "Year",
+            "type": "integer",
+            "required": true,
+            "values": []
+          }
+        ],
+        "description": "Use this operation to lookup rewards points.",
+        "request": {
+          "queryParameters": [],
+          "headers": [],
+          "representations": []
+        },
+        "responses": [
+          {
+            "statusCode": 200,
+            "headers": [],
+            "representations": [
+              {
+                "contentType": "application/json",
+                "sample": "{ \"points\": [ { \"value\":100, \"effective\":\"2021-08-01\",  \"expires\":\"2021-08-31\" } ] }"
+              }
+            ]
+          }
+        ],
+        "displayName": "Lookup reward points",
+        "method": "GET",
+        "urlTemplate": "/{memberId}/points/year/{year}"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/rewards-api/rewards-points-lookup-by-year')]",
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'rewards-api')]"
+      ]
+    },
+    {
+      "properties": {
+        "value": "<policies>\r\n\t<inbound>\r\n\t\t<base />\r\n\t\t<mock-response status-code=\"200\" content-type=\"application/json\" />\r\n\t</inbound>\r\n\t<backend>\r\n\t\t<base />\r\n\t</backend>\r\n\t<outbound>\r\n\t\t<base />\r\n\t</outbound>\r\n\t<on-error>\r\n\t\t<base />\r\n\t</on-error>\r\n</policies>",
+        "format": "rawxml"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/rewards-api/rewards-points-lookup-by-year/policy')]",
+      "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), 'rewards-api', 'rewards-points-lookup-by-year')]"
+      ]
+    },
+    {
+      "properties": {
+        "value": "<!--\n    IMPORTANT:\n    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.\n    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.\n    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.\n    - To add a policy, place the cursor at the desired insertion point and select a policy from the sidebar.\n    - To remove a policy, delete the corresponding policy statement from the policy document.\n    - Position the <base> element within a section element to inherit all policies from the corresponding section element in the enclosing scope.\n    - Remove the <base> element to prevent inheriting policies from the corresponding section element in the enclosing scope.\n    - Policies are applied in the order of their appearance, from the top down.\n    - Comments within policy elements are not supported and may disappear. Place your comments between policy elements or at a higher level scope.\n-->\r\n<policies>\r\n\t<inbound>\r\n\t\t<validate-jwt header-name=\"Authorization\" failed-validation-httpcode=\"401\" failed-validation-error-message=\"You are not authorized to perform this action.\" require-expiration-time=\"true\" require-scheme=\"Bearer\" require-signed-tokens=\"true\">\r\n\t\t\t<openid-config url=\"https://login.microsoftonline.com/b8fa9943-6e50-4d9b-a822-6653ac6a354c/v2.0/.well-known/openid-configuration\" />\r\n\t\t\t<audiences>\r\n\t\t\t\t<audience>api://customerservice-rewards-api</audience>\r\n\t\t\t</audiences>\r\n\t\t\t<issuers>\r\n\t\t\t\t<issuer>https://sts.windows.net/b8fa9943-6e50-4d9b-a822-6653ac6a354c/</issuer>\r\n\t\t\t</issuers>\r\n\t\t\t<required-claims>\r\n\t\t\t\t<claim name=\"appid\" match=\"any\">\r\n\t\t\t\t\t<value>711e3d35-2dce-4f22-86e9-2e674605c0d4</value>\r\n\t\t\t\t</claim>\r\n\t\t\t</required-claims>\r\n\t\t</validate-jwt>\r\n\t\t<base />\r\n\t</inbound>\r\n\t<backend>\r\n\t\t<base />\r\n\t</backend>\r\n\t<outbound>\r\n\t\t<base />\r\n\t</outbound>\r\n\t<on-error>\r\n\t\t<base />\r\n\t</on-error>\r\n</policies>",
+        "format": "rawxml"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/rewards-api/policy')]",
+      "type": "Microsoft.ApiManagement/service/apis/policies",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'rewards-api')]"
+      ]
+    }
+  ]
+}
