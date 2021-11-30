@@ -86,7 +86,25 @@ resource rewardpointslookupbyyear 'Microsoft.ApiManagement/service/apis/operatio
         representations: [
           {
             contentType: 'application/json'
-            sample: loadTextContent('sample.json')
+            examples: {
+              sample: {
+                description: 'Sample output'
+                value: {
+                  points: [
+                    {
+                      value: 100
+                      effective: '2021-08-01'
+                      expires: '2021-08-31'
+                    }
+                    {
+                      value: 150
+                      effective: '2021-11-02'
+                      expires: '2021-12-02'
+                    }
+                  ]
+                }
+              }
+            }
           }
         ]
       }
