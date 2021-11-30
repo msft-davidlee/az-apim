@@ -49,6 +49,15 @@ resource rewardsapi 'Microsoft.ApiManagement/service/apis@2021-04-01-preview' = 
   }
 }
 
+resource rewardsapipolicy 'Microsoft.ApiManagement/service/apis/policies@2021-04-01-preview' = {
+  parent: rewardsapi
+  name: 'policy'
+  properties: {
+    value: loadTextContent('rewardsapi.xml')
+    format: 'rawxml'
+  }
+}
+
 resource rewardpointslookupbyyear 'Microsoft.ApiManagement/service/apis/operations@2021-04-01-preview' = {
   parent: rewardsapi
   name: 'rewards-points-lookup-by-year'
@@ -88,24 +97,13 @@ resource rewardpointslookupbyyear 'Microsoft.ApiManagement/service/apis/operatio
   }
 }
 
-// resource staticSetup 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
-//   name: stackName
-//   kind: 'AzurePowerShell'
-//   location: location
-//   tags: tags
-//   identity: {
-//     type: 'UserAssigned'
-//     userAssignedIdentities: {
-//       '${subscription().id}/resourceGroups/${resourceGroup().name}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${managedUserId}': {}
-//     }
-//   }
-//   properties: {
-//     forceUpdateTag: scriptVersion
-//     azPowerShellVersion: '5.0'
-//     retentionInterval: 'P1D'
-//     arguments: '-rgName ${resourceGroup().name} -serviceName ${apim.name}'
-//     scriptContent: loadTextContent('BuildApi.ps1')
-//   }
-// }
+resource rewardpointslookupbyyearpolicy 'Microsoft.ApiManagement/service/apis/operations/policies@2021-04-01-preview' = {
+  parent: rewardpointslookupbyyear
+  name: 'policy'
+  properties: {
+    value: loadTextContent('rewardpointslookupbyyear.xml')
+    format: 'rawxml'
+  }
+}
 
 output apimName string = apim.name
