@@ -13,7 +13,7 @@ To create this APIM environment in your Azure subscription, please follow the st
 4. In your github organization for your project, create two environments, and named them dev and prod respectively.
 5. Create the following secrets in your github per environment. Be sure to populate with your desired values. The values below are all suggestions.
 6. Note that the environment suffix of dev or prod will be appened to your resource group but you will have the option to define your own resource prefix.
-7. Create a Managed user with this convention apim\<environment\>user and assign with Contributor role. This is needed to run the deployment script.
+7. Create a Managed user with this convention apim\environment\user and assign with Contributor role. This is needed to run the deployment script.
 
 ## Secrets
 | Name | Comments |
@@ -24,10 +24,33 @@ To create this APIM environment in your Azure subscription, please follow the st
 | PUBLISHER_EMAIL | your email address |
 | PUBLISHER_NAME | your name |
 
-# Demo
+# Interactive Demo
+Once you have your APIM created, you can go through the following steps to configure your APIM instance.
 
-## DevOps - Migrate
-Shows how we can migrate API changes from an existing APIM instance to a another (could be new or existing) i.e. from Dev to Prod.
+## Setup security.
+
+## DevOps - Migration Tool
+Shows how we can migrate API changes from an existing APIM instance to a another (could be new or existing) i.e. from Dev to Prod APIM instance.
 
 1. Clone the following repo: https://github.com/Azure/azure-api-management-devops-resource-kit.git
-2. 
+2. Create the following file and give it the name export.json:
+
+```
+{
+    "sourceApimName": "",
+    "destinationApimName": "",
+    "resourceGroup": "",
+    "fileFolder": "",
+    "apiName": "rewards-api",
+    "linkedTemplatesBaseUrl": "",
+    "paramNamedValue": "false",
+    "paramLogResourceId": "false"
+} 
+```
+3. Fill in the sourceApimName, destinationApimName, resourceGroup that represents your migration of API from source APIM to destination APIM instance.
+4. Fill in the fileFolder which represents the folder of where to deploy the changes to. Be sure the folder path exist.
+5. Now you are ready to run the command. You can cd into the folder of the repo and run the following command which will create the ARM Template used for deployment.
+
+```
+ dotnet run extract --extractorConfig <path to export file>\export.json
+```

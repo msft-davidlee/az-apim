@@ -49,6 +49,45 @@ resource rewardsapi 'Microsoft.ApiManagement/service/apis@2021-04-01-preview' = 
   }
 }
 
+resource rewardpointslookupbyyear 'Microsoft.ApiManagement/service/apis/operations@2021-04-01-preview' = {
+  parent: rewardsapi
+  name: 'rewards-points-lookup-by-year'
+  properties: {
+    templateParameters: [
+      {
+        name: 'memberId'
+        description: 'Member Id'
+        type: 'string'
+        required: true
+        values: []
+      }
+      {
+        name: 'year'
+        description: 'Year'
+        type: 'integer'
+        required: true
+        values: []
+      }
+    ]
+    description: 'Use this operation to lookup rewards points.'
+    responses: [
+      {
+        statusCode: 200
+        headers: []
+        representations: [
+          {
+            contentType: 'application/json'
+            sample: loadTextContent('sample.json')
+          }
+        ]
+      }
+    ]
+    displayName: 'Lookup reward points'
+    method: 'GET'
+    urlTemplate: '/{memberId}/points/year/{year}'
+  }
+}
+
 // resource staticSetup 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
 //   name: stackName
 //   kind: 'AzurePowerShell'
