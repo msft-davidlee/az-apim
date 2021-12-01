@@ -177,31 +177,7 @@ resource rewardpointslookupbyyear 'Microsoft.ApiManagement/service/apis/operatio
       {
         statusCode: 200
         headers: []
-        representations: [
-          {
-            contentType: 'application/json'
-            examples: {
-              sample: {
-                description: 'Sample output'
-                summary: 'My Sample output'
-                value: {
-                  points: [
-                    {
-                      value: 100
-                      effective: '2021-08-01'
-                      expires: '2021-08-31'
-                    }
-                    {
-                      value: 150
-                      effective: '2021-11-02'
-                      expires: '2021-12-02'
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        ]
+        representations: []
       }
     ]
     displayName: 'Lookup reward points'
@@ -210,11 +186,12 @@ resource rewardpointslookupbyyear 'Microsoft.ApiManagement/service/apis/operatio
   }
 }
 
+var rawValue = replace(loadTextContent('rewardpointslookupbyyear.xml'), '%apifuncName%', apifuncapp.name)
 resource rewardpointslookupbyyearpolicy 'Microsoft.ApiManagement/service/apis/operations/policies@2021-04-01-preview' = {
   parent: rewardpointslookupbyyear
   name: 'policy'
   properties: {
-    value: loadTextContent('rewardpointslookupbyyear.xml')
+    value: rawValue
     format: 'rawxml'
   }
 }

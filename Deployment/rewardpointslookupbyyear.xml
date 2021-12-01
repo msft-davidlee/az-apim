@@ -1,7 +1,8 @@
 <policies>
     <inbound>
         <base />
-        <mock-response status-code="200" content-type="application/json" />
+        <rewrite-uri template="/member/{memberId}/year/{year}/points" />
+        <set-backend-service base-url="https://%apifuncName%.azurewebsites.net" />        
     </inbound>
     <backend>
         <base />
