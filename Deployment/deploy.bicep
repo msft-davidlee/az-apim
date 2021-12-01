@@ -1,14 +1,14 @@
 param prefix string
-param appEenvironment string
+param appEnvironment string
 param branch string
 param location string = resourceGroup().location
 param publisherEmail string
 param publisherName string
 
-var stackName = '${prefix}${appEenvironment}'
+var stackName = '${prefix}${appEnvironment}'
 var tags = {
   'stack-name': stackName
-  'environment': appEenvironment
+  'environment': appEnvironment
   'branch': branch
 }
 
