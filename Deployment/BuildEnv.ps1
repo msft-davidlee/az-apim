@@ -10,7 +10,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$deploymentName = "apimdeploy" + (Get-Date).ToString("yyyyMMddHHmmss")
+$deploymentName = "apimfirstdeploy" + (Get-Date).ToString("yyyyMMddHHmmss")
 
 $rgName = "$RESOURCE_GROUP-$BUILD_ENV"
 
@@ -22,12 +22,17 @@ $firstDeployText = (az deployment group create --name $deploymentName --resource
 $firstDeployOutput = ($firstDeployText | ConvertFrom-Json)
 
 $apifunctionName = $firstDeployOutput.properties.outputs.apifunctionName.value
+$apifunctionVersion = $firstDeployOutput.properties.outputs.apifunctionVersion.value
+$appInsightsInstrumentationKey = $firstDeployOutput.properties.outputs.appInsightsInstrumentationKey.value
+$appInsightsResourceId = $firstDeployOutput.properties.outputs.appInsightsResourceId.value
 
 Push-Location .\src\Demo\DemoApi\
 dotnet publish -c Release -o out
 Compress-Archive out\* -DestinationPath out.zip -Force
 az functionapp deployment source config-zip -g $rgName -n $apifunctionName --src out.zip
 Pop-Location
+
+$deploymentName = "apimdeploy" + (Get-Date).ToString("yyyyMMddHHmmss")
 
 az deployment group create --name $deploymentName --resource-group $rgName --template-file Deployment/deploy.bicep --parameters `
     prefix=$PREFIX `
@@ -36,8 +41,8 @@ az deployment group create --name $deploymentName --resource-group $rgName --tem
     jwtConfigAppId=$JWT_CONFIG_APP_ID `
     jwtConfigTenantId=$JWT_CONFIG_TENANT_ID `
     apifunctionName=$apifunctionName `
-    apifunctionVersion=$firstDeployOutput.properties.outputs.apifunctionVersion.value `
-    appInsightsInstrumentationKey=$firstDeployOutput.properties.outputs.appInsightsInstrumentationKey.value `
-    appInsightsResourceId=$firstDeployOutput.properties.outputs.appInsightsResourceId.value `
+    apifunctionVersion=$apifunctionVersion `
+    appInsightsInstrumentationKey=$appInsightsInstrumentationKey `
+    appInsightsResourceId=$appInsightsResourceId `
     publisherEmail=$PUBLISHER_EMAIL `
     publisherName="$PUBLISHER_NAME"
