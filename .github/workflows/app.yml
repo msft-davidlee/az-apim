@@ -68,4 +68,4 @@ jobs:
             Push-Location .\src\Demo\DemoApi\
             dotnet publish -c Release -o out
             Compress-Archive out\* -DestinationPath out.zip -Force
-            az functionapp deployment source config-zip -g ${{ secrets.RESOURCE_GROUP }} -n ${{ steps.buildenvironment.outputs.apifuncName }} --src out.zip     
+            az functionapp deployment source config-zip -g ${{ steps.buildenvironment.outputs.deployResourceGroupName }} -n ${{ steps.buildenvironment.outputs.apifuncName }} --src out.zip     

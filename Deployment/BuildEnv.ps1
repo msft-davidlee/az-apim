@@ -24,3 +24,4 @@ $apifuncName = $deployOutput.properties.outputs.apifuncName.value
 
 Write-Host "::set-output name=serviceName::$serviceName"
 Write-Host "::set-output name=apifuncName::$apifuncName"
+Write-Host "::set-output name=deployResourceGroupName::$rgName"
