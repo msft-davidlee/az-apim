@@ -55,7 +55,7 @@ jobs:
             -PREFIX ${{ secrets.PREFIX }} `
             -GITHUB_REF ${{ github.ref }} `
             -JWT_CONFIG_APP_ID ${{ secrets.JWT_CONFIG_APP_ID }} `
-            -JWT_CONFIG_TENANT_ID $ {{ secrets.JWT_CONFIG_TENANT_ID }} `
+            -JWT_CONFIG_TENANT_ID ${{ secrets.JWT_CONFIG_TENANT_ID }} `
             -PUBLISHER_EMAIL ${{ secrets.PUBLISHER_EMAIL }} `
             -PUBLISHER_NAME "${{ secrets.PUBLISHER_NAME }}"
 
