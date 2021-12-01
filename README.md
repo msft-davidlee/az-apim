@@ -23,13 +23,13 @@ To create this APIM environment in your Azure subscription, please follow the st
 | RESOURCE_GROUP | apim - or whatever name you give to the resource group |
 | PUBLISHER_EMAIL | your email address |
 | PUBLISHER_NAME | your name |
+| JWT_CONFIG_APP_ID | App Id which is the Client Id of the application registration you have created. |
+| JWT_CONFIG_TENANT_ID | Tenant Id of the AAD instance the application is created in. |
 
-# Interactive Demo
+# Interactive Demo(s)
 Once you have your APIM created, you can go through the following steps to configure your APIM instance.
 
-## Setup security.
-
-## DevOps - Migration Tool
+## DevOps - Migration Tool Demo
 Shows how we can migrate API changes from an existing APIM instance to a another (could be new or existing) i.e. from Dev to Prod APIM instance.
 
 1. Clone the following repo: https://github.com/Azure/azure-api-management-devops-resource-kit.git
@@ -54,3 +54,4 @@ Shows how we can migrate API changes from an existing APIM instance to a another
 ```
  dotnet run extract --extractorConfig <path to export file>\export.json
 ```
+6. Now you can run the update to your new instance with commands such as ``` az deployment group create ```.

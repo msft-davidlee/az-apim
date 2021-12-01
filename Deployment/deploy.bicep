@@ -4,6 +4,8 @@ param branch string
 param location string = resourceGroup().location
 param publisherEmail string
 param publisherName string
+param jwtConfigAppId string
+param jwtConfigTenantId string
 
 var stackName = '${prefix}${appEnvironment}'
 var tags = {
@@ -143,11 +145,12 @@ resource rewardsapi 'Microsoft.ApiManagement/service/apis@2021-04-01-preview' = 
   }
 }
 
+var rawValueapi = replace(replace(loadTextContent('rewardsapi.xml'), '%jwtconfigappid%', jwtConfigAppId), '%jwtconfigtenantid%', jwtConfigTenantId)
 resource rewardsapipolicy 'Microsoft.ApiManagement/service/apis/policies@2021-04-01-preview' = {
   parent: rewardsapi
   name: 'policy'
   properties: {
-    value: loadTextContent('rewardsapi.xml')
+    value: rawValueapi
     format: 'rawxml'
   }
 }

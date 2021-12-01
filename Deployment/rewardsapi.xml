@@ -1,16 +1,16 @@
 <policies>
     <inbound>
         <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="You are not authorized to perform this action." require-expiration-time="true" require-scheme="Bearer" require-signed-tokens="true">
-            <openid-config url="https://login.microsoftonline.com/b8fa9943-6e50-4d9b-a822-6653ac6a354c/v2.0/.well-known/openid-configuration" />
+            <openid-config url="https://login.microsoftonline.com/%jwtconfigtenantid%/v2.0/.well-known/openid-configuration" />
             <audiences>
                 <audience>api://customerservice-rewards-api</audience>
             </audiences>
             <issuers>
-                <issuer>https://sts.windows.net/b8fa9943-6e50-4d9b-a822-6653ac6a354c/</issuer>
+                <issuer>https://sts.windows.net/%jwtconfigtenantid%/</issuer>
             </issuers>
             <required-claims>
                 <claim name="appid" match="any">
-                    <value>711e3d35-2dce-4f22-86e9-2e674605c0d4</value>
+                    <value>%jwtconfigappid%</value>
                 </claim>
             </required-claims>
         </validate-jwt>

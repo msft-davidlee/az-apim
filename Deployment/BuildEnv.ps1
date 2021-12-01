@@ -4,7 +4,9 @@ param(
     [string]$PREFIX,
     [string]$GITHUB_REF,
     [string]$PUBLISHER_EMAIL,
-    [string]$PUBLISHER_NAME)
+    [string]$PUBLISHER_NAME,
+    [string]$JWT_CONFIG_APP_ID,
+    [string]$JWT_CONFIG_TENANT_ID)
 
 $ErrorActionPreference = "Stop"
 
@@ -15,6 +17,8 @@ $deployText = (az deployment group create --name $deploymentName --resource-grou
         prefix=$PREFIX `
         appEnvironment=$BUILD_ENV `
         branch=$GITHUB_REF `
+        jwtConfigAppId=$JWT_CONFIG_APP_ID `
+        jwtConfigTenantId=$JWT_CONFIG_TENANT_ID `
         publisherEmail=$PUBLISHER_EMAIL `
         publisherName="$PUBLISHER_NAME")
 
