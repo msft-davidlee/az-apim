@@ -2,7 +2,10 @@
     <inbound>
         <base />
         <rewrite-uri template="/member/{memberId}/year/{year}/points" />
-        <set-backend-service base-url="https://%apifuncName%.azurewebsites.net" />        
+        <set-header name="function_key" exists-action="append">
+            <value>%apifunctionkey%</value>
+        </set-header>
+        <set-backend-service base-url="https://%apifuncName%.azurewebsites.net" />
     </inbound>
     <backend>
         <base />

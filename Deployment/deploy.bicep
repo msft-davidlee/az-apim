@@ -186,7 +186,8 @@ resource rewardpointslookupbyyear 'Microsoft.ApiManagement/service/apis/operatio
   }
 }
 
-var rawValue = replace(loadTextContent('rewardpointslookupbyyear.xml'), '%apifuncName%', apifuncapp.name)
+var functionkey = apifuncapp.listKeys().keys[0].value
+var rawValue = replace(replace(loadTextContent('rewardpointslookupbyyear.xml'), '%apifuncName%', apifuncapp.name), '%apifunctionkey%', functionkey)
 resource rewardpointslookupbyyearpolicy 'Microsoft.ApiManagement/service/apis/operations/policies@2021-04-01-preview' = {
   parent: rewardpointslookupbyyear
   name: 'policy'
