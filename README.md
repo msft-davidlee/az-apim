@@ -29,6 +29,36 @@ To create this APIM environment in your Azure subscription, please follow the st
 # Interactive Demo(s)
 Once you have your APIM created, you can go through the following steps to configure your APIM instance.
 
+## Self-Hosted Gateway Demo
+Shows how we can use APIM as the frontend for an internal application hosted "on premise".
+
+1. cd into the src/Demo folder
+2. Run the following command to create the docker image ``` docker build -f /DemoHosted/AppDockerfile -t "demo/hostedapp:1.0" . ```.
+3. Run the following command to run the docker container ``` docker run -d -p 8080:80 --name hostedapp "demo/hostedapp:1.0" ```.
+4. Run the following command to ensure the app is running ``` curl "http://localhost:8080/rewards?memberId=1234A&year=2021" ```
+5. You should see something similar:
+
+```
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"memberId":"1234A","points":[{"effective":"2021-03-01T00:00:00","expires":"2021-05-01T00:00:00","value":12}]}
+RawContent        : HTTP/1.1 200 OK
+                    Transfer-Encoding: chunked
+                    Content-Type: application/json; charset=utf-8
+                    Date: Wed, 01 Dec 2021 14:54:01 GMT
+                    Server: Kestrel
+
+                    {"memberId":"1234A","points":[{"effective":"2021-03-...
+Forms             : {}
+Headers           : {[Transfer-Encoding, chunked], [Content-Type, application/json; charset=utf-8], [Date, Wed, 01 Dec 2021 14:54:01 GMT], [Server, Kestrel]}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 110
+```
+6. Next, you can follow the instructions here to setup your self-hosted APIM gateway https://docs.microsoft.com/en-us/azure/api-management/how-to-deploy-self-hosted-gateway-docker
+
 ## DevOps - Migration Tool Demo
 Shows how we can migrate API changes from an existing APIM instance to a another (could be new or existing) i.e. from Dev to Prod APIM instance.
 

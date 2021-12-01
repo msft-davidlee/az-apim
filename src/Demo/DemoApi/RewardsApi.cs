@@ -47,7 +47,7 @@ namespace DemoApi
             string memberId,
             int year)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation($"Processed points lookup for Member: {memberId} in year {year}.");
 
             if (year > DateTime.UtcNow.Year)
             {
