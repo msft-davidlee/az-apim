@@ -37,7 +37,7 @@ namespace DemoApi
     {
         [FunctionName(nameof(GetMemberAnnualPoints))]
         [OpenApiOperation(operationId: "GetMemberAnnualPointsByMemberIdAndYear", tags: new[] { "Get Member Annual Points By MemberId And Year." })]
-        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Header)]
+        [OpenApiSecurity("x-functions-key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Header)]
         [OpenApiParameter(name: "memberId", In = ParameterLocation.Path, Required = true, Type = typeof(string), Description = "The **MemberId** parameter")]
         [OpenApiParameter(name: "year", In = ParameterLocation.Path, Required = true, Type = typeof(int), Description = "The **Year** parameter")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(AnnualPoints), Description = "The AnnualPoints response")]
