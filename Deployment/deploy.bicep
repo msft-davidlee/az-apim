@@ -186,8 +186,7 @@ resource rewardpointslookupbyyear 'Microsoft.ApiManagement/service/apis/operatio
   }
 }
 
-var functionkey = apifuncapp.listKeys().keys[0].value
-var rawValue = replace(replace(loadTextContent('rewardpointslookupbyyear.xml'), '%apifuncName%', apifuncapp.name), '%apifunctionkey%', functionkey)
+var rawValue = replace(replace(loadTextContent('rewardpointslookupbyyear.xml'), '%apifuncName%', apifuncapp.name), '%apifunctionkey%', listKeys(resourceId('Microsoft.Web/sites/functions', apifuncapp.name, 'GetMemberAnnualPoints'), apifuncapp.apiVersion).default)
 resource rewardpointslookupbyyearpolicy 'Microsoft.ApiManagement/service/apis/operations/policies@2021-04-01-preview' = {
   parent: rewardpointslookupbyyear
   name: 'policy'
