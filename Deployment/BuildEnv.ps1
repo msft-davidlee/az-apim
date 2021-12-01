@@ -4,21 +4,45 @@ param(
     [string]$PREFIX,
     [string]$GITHUB_REF,
     [string]$PUBLISHER_EMAIL,
-    [string]$PUBLISHER_NAME)
+    [string]$PUBLISHER_NAME,
+    [string]$JWT_CONFIG_APP_ID,
+    [string]$JWT_CONFIG_TENANT_ID)
 
 $ErrorActionPreference = "Stop"
 
-$deploymentName = "apimdeploy" + (Get-Date).ToString("yyyyMMddHHmmss")
+$deploymentName = "apimfirstdeploy" + (Get-Date).ToString("yyyyMMddHHmmss")
 
 $rgName = "$RESOURCE_GROUP-$BUILD_ENV"
-$deployText = (az deployment group create --name $deploymentName --resource-group $rgName --template-file Deployment/deploy.bicep --parameters `
+
+$firstDeployText = (az deployment group create --name $deploymentName --resource-group $rgName --template-file Deployment/first.bicep --parameters `
         prefix=$PREFIX `
-        environment=$BUILD_ENV `
-        branch=$GITHUB_REF `
-        publisherEmail=$PUBLISHER_EMAIL `
-        publisherName="$PUBLISHER_NAME")
+        appEnvironment=$BUILD_ENV `
+        branch=$GITHUB_REF)
 
-$deployOutput = ($deployText | ConvertFrom-Json)
-$serviceName = $deployOutput.properties.outputs.apimName.value
+$firstDeployOutput = ($firstDeployText | ConvertFrom-Json)
 
-Write-Host "::set-output name=serviceName::$serviceName"
+$apifunctionName = $firstDeployOutput.properties.outputs.apifunctionName.value
+$apifunctionVersion = $firstDeployOutput.properties.outputs.apifunctionVersion.value
+$appInsightsInstrumentationKey = $firstDeployOutput.properties.outputs.appInsightsInstrumentationKey.value
+$appInsightsResourceId = $firstDeployOutput.properties.outputs.appInsightsResourceId.value
+
+Push-Location .\src\Demo\DemoApi\
+dotnet publish -c Release -o out
+Compress-Archive out\* -DestinationPath out.zip -Force
+az functionapp deployment source config-zip -g $rgName -n $apifunctionName --src out.zip
+Pop-Location
+
+$deploymentName = "apimdeploy" + (Get-Date).ToString("yyyyMMddHHmmss")
+
+az deployment group create --name $deploymentName --resource-group $rgName --template-file Deployment/deploy.bicep --parameters `
+    prefix=$PREFIX `
+    appEnvironment=$BUILD_ENV `
+    branch=$GITHUB_REF `
+    jwtConfigAppId=$JWT_CONFIG_APP_ID `
+    jwtConfigTenantId=$JWT_CONFIG_TENANT_ID `
+    apifunctionName=$apifunctionName `
+    apifunctionVersion=$apifunctionVersion `
+    appInsightsInstrumentationKey=$appInsightsInstrumentationKey `
+    appInsightsResourceId=$appInsightsResourceId `
+    publisherEmail=$PUBLISHER_EMAIL `
+    publisherName="$PUBLISHER_NAME"

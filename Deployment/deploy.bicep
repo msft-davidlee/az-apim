@@ -1,16 +1,20 @@
 param prefix string
-param environment string
+param appEnvironment string
 param branch string
 param location string = resourceGroup().location
 param publisherEmail string
 param publisherName string
-param managedUserId string = 'apim${environment}user'
-param scriptVersion string = utcNow()
+param jwtConfigAppId string
+param jwtConfigTenantId string
+param apifunctionName string
+param apifunctionVersion string
+param appInsightsInstrumentationKey string
+param appInsightsResourceId string
 
-var stackName = '${prefix}${environment}'
+var stackName = '${prefix}${appEnvironment}'
 var tags = {
   'stack-name': stackName
-  'environment': environment
+  'environment': appEnvironment
   'branch': branch
 }
 
@@ -28,24 +32,100 @@ resource apim 'Microsoft.ApiManagement/service@2021-01-01-preview' = {
   }
 }
 
-resource staticSetup 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
-  name: stackName
-  kind: 'AzurePowerShell'
-  location: location
-  tags: tags
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: {
-      '${subscription().id}/resourceGroups/${resourceGroup().name}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${managedUserId}': {}
-    }
-  }
+resource rewardsapi 'Microsoft.ApiManagement/service/apis@2021-04-01-preview' = {
+  parent: apim
+  name: 'rewards-api'
   properties: {
-    forceUpdateTag: scriptVersion
-    azPowerShellVersion: '5.0'
-    retentionInterval: 'P1D'
-    arguments: '-rgName ${resourceGroup().name} -serviceName ${apim.name}'
-    scriptContent: loadTextContent('BuildApi.ps1')
+    subscriptionRequired: true
+    subscriptionKeyParameterNames: {
+      header: 'Ocp-Apim-Subscription-Key'
+      query: 'subscription-key'
+    }
+    apiRevision: '1'
+    isCurrent: true
+    displayName: 'Rewards API'
+    path: 'rewards'
+    protocols: [
+      'http'
+      'https'
+    ]
+  }
+}
+
+var rawValueapi = replace(replace(loadTextContent('rewardsapi.xml'), '%jwtconfigappid%', jwtConfigAppId), '%jwtconfigtenantid%', jwtConfigTenantId)
+resource rewardsapipolicy 'Microsoft.ApiManagement/service/apis/policies@2021-04-01-preview' = {
+  parent: rewardsapi
+  name: 'policy'
+  properties: {
+    value: rawValueapi
+    format: 'rawxml'
+  }
+}
+
+resource rewardpointslookupbyyear 'Microsoft.ApiManagement/service/apis/operations@2021-04-01-preview' = {
+  parent: rewardsapi
+  name: 'rewards-points-lookup-by-year'
+  properties: {
+    templateParameters: [
+      {
+        name: 'memberId'
+        description: 'Member Id'
+        type: 'string'
+        required: true
+        values: []
+      }
+      {
+        name: 'year'
+        description: 'Year'
+        type: 'integer'
+        required: true
+        values: []
+      }
+    ]
+    description: 'Use this operation to lookup rewards points.'
+    responses: [
+      {
+        statusCode: 200
+        headers: []
+        representations: []
+      }
+    ]
+    displayName: 'Lookup reward points'
+    method: 'GET'
+    urlTemplate: '/{memberId}/points/year/{year}'
+  }
+}
+
+var rawValue = replace(replace(loadTextContent('rewardpointslookupbyyear.xml'), '%apifuncName%', apifunctionName), '%apifunctionkey%', listKeys(resourceId('Microsoft.Web/sites/functions', apifunctionName, 'GetMemberAnnualPoints'), apifunctionVersion).default)
+resource rewardpointslookupbyyearpolicy 'Microsoft.ApiManagement/service/apis/operations/policies@2021-04-01-preview' = {
+  parent: rewardpointslookupbyyear
+  name: 'policy'
+  properties: {
+    value: rawValue
+    format: 'rawxml'
   }
 }
 
 output apimName string = apim.name
+
+resource apimlogger 'Microsoft.ApiManagement/service/loggers@2021-04-01-preview' = {
+  parent: apim
+  name: stackName
+  properties: {
+    loggerType: 'applicationInsights'
+    credentials: {
+      instrumentationKey: appInsightsInstrumentationKey
+    }
+    resourceId: appInsightsResourceId
+  }
+}
+
+resource apimselfhostedgateway 'Microsoft.ApiManagement/service/gateways@2021-04-01-preview' = {
+  parent: apim
+  name: 'corp'
+  properties: {
+    locationData: {
+      name: 'Dallas TX'
+    }
+  }
+}

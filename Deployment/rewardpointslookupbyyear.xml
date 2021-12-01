@@ -1,0 +1,19 @@
+<policies>
+    <inbound>
+        <base />
+        <rewrite-uri template="/member/{memberId}/year/{year}/points" />
+        <set-header name="x-functions-key" exists-action="append">
+            <value>%apifunctionkey%</value>
+        </set-header>
+        <set-backend-service base-url="https://%apifuncName%.azurewebsites.net" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
