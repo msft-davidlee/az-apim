@@ -34,8 +34,8 @@ Shows how we can use APIM as the frontend for an internal application hosted "on
 
 1. cd into the src/Demo folder
 2. Run the following command to create the docker image ``` docker build -f /DemoHosted/AppDockerfile -t "demo/hostedapp:1.0" . ```.
-3. Run the following command to run the docker container ``` docker run -d -p 8080:80 --name hostedapp "demo/hostedapp:1.0" ```.
-4. Run the following command to ensure the app is running ``` curl "http://localhost:8080/rewards?memberId=1234A&year=2021" ```
+3. Run the following command to run the docker container ``` docker run -d -p 8090:80 --name hostedapp "demo/hostedapp:1.0" ```.
+4. Run the following command to ensure the app is running ``` curl "http://localhost:8090/rewards?memberId=1234A&year=2021" ```
 5. You should see something similar:
 
 ```
@@ -58,6 +58,9 @@ ParsedHtml        : mshtml.HTMLDocumentClass
 RawContentLength  : 110
 ```
 6. Next, you can follow the instructions here to setup your self-hosted APIM gateway https://docs.microsoft.com/en-us/azure/api-management/how-to-deploy-self-hosted-gateway-docker
+7. After you have complete this step, we should inspect the internal IP addresses of both the APIM gateway container and Hosted App container. Do a ``` docker ps ``` to see the container id and use that for the following command: ``` docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' CONTAINER_ID ```. If you want to do a quick test locally, you can also login to the container itself using the following command ``` docker exec -it corp /bin/bash ```. This allows you to now do ``` curl "http://IP_ADDRESS/rewards?memberId=1234A&year=2021" ``` inside of the container itself.
+8. Now we are ready to build the API. We can clone the Rewards API, maybe give the API URL suffix rewards2 as the value. Next, we should change the gateway from Managed to corp. Lastly, we should add a re-write policy with the following ``` /rewards?memberId={memberId}&year={year} ``` to transform the incoming request to the expected request going to the local service.
+9. Note that your APIM self-hosted gateway is running locally on port 80 by default if you did not change any setthings. You can now craft the following type of HTTP GET request ``` http://localhost/rewards2/5454/points/year/2012 ```. Obviously, you need to add the necessary Subscription Key as it is enabled. 
 
 ## DevOps - Migration Tool Demo
 Shows how we can migrate API changes from an existing APIM instance to a another (could be new or existing) i.e. from Dev to Prod APIM instance.
