@@ -6,6 +6,10 @@ param publisherEmail string
 param publisherName string
 param jwtConfigAppId string
 param jwtConfigTenantId string
+param apifunctionName string
+param apifunctionVersion string
+param appInsightsInstrumentationKey string
+param appInsightsResourceId string
 
 var stackName = '${prefix}${appEnvironment}'
 var tags = {
@@ -13,102 +17,6 @@ var tags = {
   'environment': appEnvironment
   'branch': branch
 }
-
-resource appinsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: stackName
-  location: location
-  tags: tags
-  kind: 'web'
-  properties: {
-    Application_Type: 'web'
-    ImmediatePurgeDataOn30Days: true
-    IngestionMode: 'ApplicationInsights'
-  }
-}
-
-var apiapp = '${stackName}api'
-resource apiappStr 'Microsoft.Storage/storageAccounts@2021-02-01' = {
-  name: apiapp
-  location: location
-  sku: {
-    name: 'Standard_LRS'
-  }
-  kind: 'StorageV2'
-  properties: {
-    supportsHttpsTrafficOnly: true
-    allowBlobPublicAccess: false
-  }
-  tags: tags
-}
-
-resource apiappplan 'Microsoft.Web/serverfarms@2020-10-01' = {
-  name: apiapp
-  location: location
-  tags: tags
-  sku: {
-    name: 'Y1'
-    tier: 'Dynamic'
-  }
-}
-
-var apiappConnection = 'DefaultEndpointsProtocol=https;AccountName=${apiappStr.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(apiappStr.id, apiappStr.apiVersion).keys[0].value}'
-resource apifuncapp 'Microsoft.Web/sites@2020-12-01' = {
-  name: apiapp
-  location: location
-  tags: tags
-  kind: 'functionapp'
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    httpsOnly: true
-    serverFarmId: apiappplan.id
-    clientAffinityEnabled: true
-    siteConfig: {
-      webSocketsEnabled: true
-      appSettings: [
-        {
-          'name': 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          'value': appinsights.properties.InstrumentationKey
-        }
-        {
-          'name': 'AzureWebJobsDashboard'
-          'value': apiappConnection
-        }
-        {
-          'name': 'AzureWebJobsStorage'
-          'value': apiappConnection
-        }
-        {
-          'name': 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          'value': apiappConnection
-        }
-        {
-          'name': 'WEBSITE_CONTENTSHARE'
-          'value': 'functions2021'
-        }
-        {
-          'name': 'FUNCTIONS_WORKER_RUNTIME'
-          'value': 'dotnet'
-        }
-        {
-          'name': 'FUNCTIONS_EXTENSION_VERSION'
-          'value': '~3'
-        }
-        {
-          'name': 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          'value': '~2'
-        }
-        {
-          'name': 'XDT_MicrosoftApplicationInsights_Mode'
-          'value': 'default'
-        }
-      ]
-    }
-  }
-}
-
-output apifuncName string = apifuncapp.name
 
 resource apim 'Microsoft.ApiManagement/service@2021-01-01-preview' = {
   name: stackName
@@ -136,7 +44,6 @@ resource rewardsapi 'Microsoft.ApiManagement/service/apis@2021-04-01-preview' = 
     apiRevision: '1'
     isCurrent: true
     displayName: 'Rewards API'
-    serviceUrl: 'https://contoso'
     path: 'rewards'
     protocols: [
       'http'
@@ -189,7 +96,7 @@ resource rewardpointslookupbyyear 'Microsoft.ApiManagement/service/apis/operatio
   }
 }
 
-var rawValue = replace(replace(loadTextContent('rewardpointslookupbyyear.xml'), '%apifuncName%', apifuncapp.name), '%apifunctionkey%', listKeys(resourceId('Microsoft.Web/sites/functions', apifuncapp.name, 'GetMemberAnnualPoints'), apifuncapp.apiVersion).default)
+var rawValue = replace(replace(loadTextContent('rewardpointslookupbyyear.xml'), '%apifuncName%', apifunctionName), '%apifunctionkey%', listKeys(resourceId('Microsoft.Web/sites/functions', apifunctionName, 'GetMemberAnnualPoints'), apifunctionVersion).default)
 resource rewardpointslookupbyyearpolicy 'Microsoft.ApiManagement/service/apis/operations/policies@2021-04-01-preview' = {
   parent: rewardpointslookupbyyear
   name: 'policy'
@@ -200,3 +107,25 @@ resource rewardpointslookupbyyearpolicy 'Microsoft.ApiManagement/service/apis/op
 }
 
 output apimName string = apim.name
+
+resource apimlogger 'Microsoft.ApiManagement/service/loggers@2021-04-01-preview' = {
+  parent: apim
+  name: stackName
+  properties: {
+    loggerType: 'applicationInsights'
+    credentials: {
+      instrumentationKey: appInsightsInstrumentationKey
+    }
+    resourceId: appInsightsResourceId
+  }
+}
+
+resource apimselfhostedgateway 'Microsoft.ApiManagement/service/gateways@2021-04-01-preview' = {
+  parent: apim
+  name: 'corp'
+  properties: {
+    locationData: {
+      name: 'Dallas TX'
+    }
+  }
+}

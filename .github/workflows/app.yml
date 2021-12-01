@@ -47,6 +47,11 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           enable-AzPSSession: true
 
+      - name: Setup .NET Core SDK 3.1.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "3.1.x"          
+
       - id: buildenvironment
         name: Build Azure environment
         run: |
@@ -58,16 +63,3 @@ jobs:
             -JWT_CONFIG_TENANT_ID ${{ secrets.JWT_CONFIG_TENANT_ID }} `
             -PUBLISHER_EMAIL ${{ secrets.PUBLISHER_EMAIL }} `
             -PUBLISHER_NAME "${{ secrets.PUBLISHER_NAME }}"
-
-      - name: Setup .NET Core SDK 3.1.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "3.1.x"
-
-      - id: publish
-        name: Publish Code
-        run: |
-          Push-Location .\src\Demo\DemoApi\
-          dotnet publish -c Release -o out
-          Compress-Archive out\* -DestinationPath out.zip -Force
-          az functionapp deployment source config-zip -g ${{ steps.buildenvironment.outputs.deployResourceGroupName }} -n ${{ steps.buildenvironment.outputs.apifuncName }} --src out.zip
