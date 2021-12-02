@@ -26,10 +26,10 @@ To create this APIM environment in your Azure subscription, please follow the st
 | JWT_CONFIG_APP_ID | App Id which is the Client Id of the application registration you have created. |
 | JWT_CONFIG_TENANT_ID | Tenant Id of the AAD instance the application is created in. |
 
-# Interactive Demo(s)
-Once you have your APIM created, you can go through the following steps to configure your APIM instance.
+# Use cases
+Once you have your APIM created, you can go through the following use cases to configure your APIM instance.
 
-## Self-Hosted Gateway Demo
+## Self-Hosted Gateway for On Prem services
 Shows how we can use APIM as the frontend for an internal application hosted "on premise".
 
 1. cd into the src/Demo folder
@@ -62,7 +62,14 @@ RawContentLength  : 110
 8. Now we are ready to build the API. We can clone the Rewards API, maybe give the API URL suffix rewards2 as the value. Next, we should change the gateway from Managed to corp. Lastly, we should add a re-write policy with the following ``` /rewards?memberId={memberId}&year={year} ``` to transform the incoming request to the expected request going to the local service.
 9. Note that your APIM self-hosted gateway is running locally on port 80 by default if you did not change any setthings. You can now craft the following type of HTTP GET request ``` http://localhost/rewards2/5454/points/year/2012 ```. Obviously, you need to add the necessary Subscription Key as it is enabled. 
 
-## DevOps - Migration Tool Demo
+
+## Protecting your API
+We can apply the following policy on your API which will limit the number of calls in a 5 mins window to 5 calls. We should note that Postman is a great tool to configure this testing experience. 
+```
+<quota-by-key calls="5" renewal-period="300" counter-key="@(context.Subscription?.Key ?? "anonymous")" />
+```
+
+## DevOps CD via Azure API Management DevOps Resource Kit
 Shows how we can migrate API changes from an existing APIM instance to a another (could be new or existing) i.e. from Dev to Prod APIM instance.
 
 1. Clone the following repo: https://github.com/Azure/azure-api-management-devops-resource-kit.git
@@ -87,4 +94,4 @@ Shows how we can migrate API changes from an existing APIM instance to a another
 ```
  dotnet run extract --extractorConfig <path to export file>\export.json
 ```
-6. Now you can run the update to your new instance with commands such as ``` az deployment group create ```.
+6. Now you can run the update to your new instance with commands such as ``` az deployment group create ``` with the appropriate parameters. For more information, see https://docs.microsoft.com/en-us/cli/azure/deployment/group?view=azure-cli-latest#az_deployment_group_create.
