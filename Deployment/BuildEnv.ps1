@@ -16,7 +16,7 @@ $deploymentName = "apimfirstdeploy" + (Get-Date).ToString("yyyyMMddHHmmss")
 $firstDeployText = (az deployment group create --name $deploymentName --resource-group $RESOURCE_GROUP --template-file Deployment/first.bicep --parameters `
         prefix=$PREFIX `
         version=$RUN_NUMBER `
-        appEnvironment=$BUILD_ENV `
+        stackEnvironment=$BUILD_ENV `
         branch=$GITHUB_REF)
 
 $firstDeployOutput = ($firstDeployText | ConvertFrom-Json)
