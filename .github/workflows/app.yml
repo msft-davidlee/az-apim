@@ -64,3 +64,14 @@ jobs:
             -JWT_CONFIG_TENANT_ID ${{ secrets.JWT_CONFIG_TENANT_ID }} `
             -PUBLISHER_EMAIL ${{ secrets.PUBLISHER_EMAIL }} `
             -PUBLISHER_NAME "${{ secrets.PUBLISHER_NAME }}"
+
+      - name: Run API Tests
+        id: run-newman
+        uses: anthonyvscode/newman-action@v1
+        with:
+          collection: Test\APIM-Managed.postman_collection.json
+          envVar: ClientId=${{ secrets.JWT_CONFIG_APP_ID }} ClientSecret=${{ secrets.JWT_CONFIG_APP_SECRET }} TenantId=${{ secrets.JWT_CONFIG_TENANT_ID }} SubscriptionKey=${{ steps.buildenvironment.outputs.subscriptionKey }} StackName=${{ steps.buildenvironment.outputs.stackName }}
+          reporters: cli
+
+      - name: Output summary to console
+        run: echo ${{ steps.run-newman.outputs.summary }}            

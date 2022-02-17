@@ -34,16 +34,26 @@ Pop-Location
 
 $deploymentName = "apimdeploy" + (Get-Date).ToString("yyyyMMddHHmmss")
 
-az deployment group create --name $deploymentName --resource-group $RESOURCE_GROUP --template-file Deployment/deploy.bicep --parameters `
-    prefix=$PREFIX `
-    stackEnvironment=$BUILD_ENV `
-    branch=$GITHUB_REF `
-    version=$RUN_NUMBER `
-    jwtConfigAppId=$JWT_CONFIG_APP_ID `
-    jwtConfigTenantId=$JWT_CONFIG_TENANT_ID `
-    apifunctionName=$apifunctionName `
-    apifunctionVersion=$apifunctionVersion `
-    appInsightsInstrumentationKey=$appInsightsInstrumentationKey `
-    appInsightsResourceId=$appInsightsResourceId `
-    publisherEmail=$PUBLISHER_EMAIL `
-    publisherName="$PUBLISHER_NAME"
+$deploymentText = (az deployment group create --name $deploymentName --resource-group $RESOURCE_GROUP --template-file Deployment/deploy.bicep --parameters `
+        prefix=$PREFIX `
+        stackEnvironment=$BUILD_ENV `
+        branch=$GITHUB_REF `
+        version=$RUN_NUMBER `
+        jwtConfigAppId=$JWT_CONFIG_APP_ID `
+        jwtConfigTenantId=$JWT_CONFIG_TENANT_ID `
+        apifunctionName=$apifunctionName `
+        apifunctionVersion=$apifunctionVersion `
+        appInsightsInstrumentationKey=$appInsightsInstrumentationKey `
+        appInsightsResourceId=$appInsightsResourceId `
+        publisherEmail=$PUBLISHER_EMAIL `
+        publisherName="$PUBLISHER_NAME")
+
+$deploymentOutput = ($deploymentText | ConvertFrom-Json)
+$stackName = $deploymentOutput.properties.outputs.stackName.value
+
+$apimContext = New-AzApiManagementContext -ResourceGroupName $RESOURCE_GROUP -ServiceName $stackName
+$keys = Get-AzApiManagementSubscriptionKey -Context $apimContext -SubscriptionId master
+$subscriptionKey = $keys.PrimaryKey
+
+Write-Host "::set-output name=subscriptionKey::$subscriptionKey"
+Write-Host "::set-output name=stackName::$stackName"

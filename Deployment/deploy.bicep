@@ -131,3 +131,5 @@ resource apimselfhostedgateway 'Microsoft.ApiManagement/service/gateways@2021-04
     }
   }
 }
+
+output stackName string = stackName
