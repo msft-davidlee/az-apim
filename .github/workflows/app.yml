@@ -44,7 +44,7 @@ jobs:
       - name: Azure CLI Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.MS_AZURE_CREDENTIALS }}
           enable-AzPSSession: true
 
       - name: Setup .NET Core SDK 3.1.x
@@ -59,6 +59,7 @@ jobs:
             -RESOURCE_GROUP ${{ secrets.RESOURCE_GROUP }} `
             -PREFIX ${{ secrets.PREFIX }} `
             -GITHUB_REF ${{ github.ref }} `
+            -RUN_NUMBER ${{ github.run_number }} `
             -JWT_CONFIG_APP_ID ${{ secrets.JWT_CONFIG_APP_ID }} `
             -JWT_CONFIG_TENANT_ID ${{ secrets.JWT_CONFIG_TENANT_ID }} `
             -PUBLISHER_EMAIL ${{ secrets.PUBLISHER_EMAIL }} `

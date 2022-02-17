@@ -1,7 +1,7 @@
 param prefix string
-param appEnvironment string
+param stackEnvironment string
 param branch string
-param location string = resourceGroup().location
+param location string = 'centralus'
 param publisherEmail string
 param publisherName string
 param jwtConfigAppId string
@@ -10,12 +10,14 @@ param apifunctionName string
 param apifunctionVersion string
 param appInsightsInstrumentationKey string
 param appInsightsResourceId string
+param version string
 
-var stackName = '${prefix}${appEnvironment}'
+var stackName = '${prefix}${stackEnvironment}'
 var tags = {
   'stack-name': stackName
-  'environment': appEnvironment
-  'branch': branch
+  'stack-version': version
+  'stack-environment': stackEnvironment
+  'stack-branch': branch
 }
 
 resource apim 'Microsoft.ApiManagement/service@2021-01-01-preview' = {

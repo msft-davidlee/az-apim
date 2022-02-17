@@ -1,5 +1,6 @@
 param(
-    [string]$BUILD_ENV, 
+    [string]$BUILD_ENV,
+    [string]$RUN_NUMBER,
     [string]$RESOURCE_GROUP, 
     [string]$PREFIX,
     [string]$GITHUB_REF,
@@ -12,10 +13,9 @@ $ErrorActionPreference = "Stop"
 
 $deploymentName = "apimfirstdeploy" + (Get-Date).ToString("yyyyMMddHHmmss")
 
-$rgName = "$RESOURCE_GROUP-$BUILD_ENV"
-
-$firstDeployText = (az deployment group create --name $deploymentName --resource-group $rgName --template-file Deployment/first.bicep --parameters `
+$firstDeployText = (az deployment group create --name $deploymentName --resource-group $RESOURCE_GROUP --template-file Deployment/first.bicep --parameters `
         prefix=$PREFIX `
+        version=$RUN_NUMBER `
         appEnvironment=$BUILD_ENV `
         branch=$GITHUB_REF)
 
@@ -29,15 +29,16 @@ $appInsightsResourceId = $firstDeployOutput.properties.outputs.appInsightsResour
 Push-Location .\src\Demo\DemoApi\
 dotnet publish -c Release -o out
 Compress-Archive out\* -DestinationPath out.zip -Force
-az functionapp deployment source config-zip -g $rgName -n $apifunctionName --src out.zip
+az functionapp deployment source config-zip -g $RESOURCE_GROUP -n $apifunctionName --src out.zip
 Pop-Location
 
 $deploymentName = "apimdeploy" + (Get-Date).ToString("yyyyMMddHHmmss")
 
-az deployment group create --name $deploymentName --resource-group $rgName --template-file Deployment/deploy.bicep --parameters `
+az deployment group create --name $deploymentName --resource-group $RESOURCE_GROUP --template-file Deployment/deploy.bicep --parameters `
     prefix=$PREFIX `
-    appEnvironment=$BUILD_ENV `
+    stackEnvironment=$BUILD_ENV `
     branch=$GITHUB_REF `
+    version=$RUN_NUMBER `
     jwtConfigAppId=$JWT_CONFIG_APP_ID `
     jwtConfigTenantId=$JWT_CONFIG_TENANT_ID `
     apifunctionName=$apifunctionName `
