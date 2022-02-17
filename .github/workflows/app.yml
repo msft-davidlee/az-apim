@@ -65,12 +65,23 @@ jobs:
             -PUBLISHER_EMAIL ${{ secrets.PUBLISHER_EMAIL }} `
             -PUBLISHER_NAME "${{ secrets.PUBLISHER_NAME }}"
 
+      - name: Get APIM subscription key
+        uses: azure/powershell@v1
+        id: getsubscriptionkey
+        with:
+          inlineScript: |
+            $apimContext = New-AzApiManagementContext -ResourceGroupName ${{ secrets.RESOURCE_GROUP }} -ServiceName ${{ steps.buildenvironment.outputs.stackName }}
+            $keys = Get-AzApiManagementSubscriptionKey -Context $apimContext -SubscriptionId master
+            $subscriptionKey = $keys.PrimaryKey
+            Write-Host "::set-output name=subscriptionKey::$subscriptionKey"
+          azPSVersion: "latest"            
+
       - name: Run API Tests
         id: run-newman
         uses: anthonyvscode/newman-action@v1
         with:
           collection: Test\APIM-Managed.postman_collection.json
-          envVar: ClientId=${{ secrets.JWT_CONFIG_APP_ID }} ClientSecret=${{ secrets.JWT_CONFIG_APP_SECRET }} TenantId=${{ secrets.JWT_CONFIG_TENANT_ID }} SubscriptionKey=${{ steps.buildenvironment.outputs.subscriptionKey }} StackName=${{ steps.buildenvironment.outputs.stackName }}
+          envVar: ClientId=${{ secrets.JWT_CONFIG_APP_ID }} ClientSecret=${{ secrets.JWT_CONFIG_APP_SECRET }} TenantId=${{ secrets.JWT_CONFIG_TENANT_ID }} SubscriptionKey=${{ steps.getsubscriptionkey.outputs.subscriptionKey }} StackName=${{ steps.buildenvironment.outputs.stackName }}
           reporters: cli
 
       - name: Output summary to console

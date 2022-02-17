@@ -50,10 +50,4 @@ $deploymentText = (az deployment group create --name $deploymentName --resource-
 
 $deploymentOutput = ($deploymentText | ConvertFrom-Json)
 $stackName = $deploymentOutput.properties.outputs.stackName.value
-
-$apimContext = New-AzApiManagementContext -ResourceGroupName $RESOURCE_GROUP -ServiceName $stackName
-$keys = Get-AzApiManagementSubscriptionKey -Context $apimContext -SubscriptionId master
-$subscriptionKey = $keys.PrimaryKey
-
-Write-Host "::set-output name=subscriptionKey::$subscriptionKey"
 Write-Host "::set-output name=stackName::$stackName"
