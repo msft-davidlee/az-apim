@@ -11,11 +11,11 @@ $apimContext = New-AzApiManagementContext -ResourceGroupName $RESOURCE_GROUP -Se
 $keys = Get-AzApiManagementSubscriptionKey -Context $apimContext -SubscriptionId master
 $subscriptionKey = $keys.PrimaryKey
 
-$obj = @{ "name" = "vars"; values = @( 
-        @{ name = "ClientId"; value = $JWT_CONFIG_APP_ID; }; 
-        @{ name = "ClientSecret"; value = $JWT_CONFIG_APP_SECRET; }; 
-        @{ name = "TenantId"; value = $JWT_CONFIG_TENANT_ID; }; 
-        @{ name = "SubscriptionKey"; value = $subscriptionKey; }; 
-        @{ name = "StackName"; value = $StackName; }; ) 
+$obj = @{ id = "9839bdec-3169-476d-bac2-be860f222568"; "name" = "vars"; values = @( 
+        @{ key = "ClientId"; value = $JWT_CONFIG_APP_ID; enabled = $true; }; 
+        @{ key = "ClientSecret"; value = $JWT_CONFIG_APP_SECRET; enabled = $true; }; 
+        @{ key = "TenantId"; value = $JWT_CONFIG_TENANT_ID; enabled = $true; }; 
+        @{ key = "SubscriptionKey"; value = $subscriptionKey; enabled = $true; }; 
+        @{ key = "StackName"; value = $StackName; enabled = $true; }; ) 
 }
 $obj | ConvertTo-Json | Out-File $FilePath -Encoding ASCII
