@@ -86,7 +86,4 @@ jobs:
         with:
           collection: Test\APIM-Managed.postman_collection.json
           environment: ${{ env.postmanVarFilePath }}
-          reporters: cli
-
-      - name: Output summary to console
-        run: echo ${{ steps.run-newman.outputs.summary }}            
+          reporters: cli        

@@ -93,7 +93,16 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							""
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"    //parse the response JSON and test three properties\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson.memberId).to.eql('5454A');    \r",
+							"    pm.expect(responseJson.points.length).to.be.above(0);\r",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -114,7 +123,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://{{StackName}}.azure-api.net/rewards/5454A/points/year/2012",
+					"raw": "https://{{StackName}}.azure-api.net/rewards/5454A/points/year/2014",
 					"protocol": "https",
 					"host": [
 						"{{StackName}}",
@@ -126,7 +135,7 @@
 						"5454A",
 						"points",
 						"year",
-						"2012"
+						"2014"
 					]
 				}
 			},
