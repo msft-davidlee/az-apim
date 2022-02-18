@@ -1,0 +1,149 @@
+{
+	"info": {
+		"_postman_id": "6645a8f8-9ac7-4b34-a0fa-5c8bd196b454",
+		"name": "APIM-Managed",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "ClientCredentialsFlowFromClient",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var obj = pm.response.json();\r",
+							"pm.environment.set(\"token\", obj.access_token)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "{{ClientId}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{ClientSecret}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "api://customerservice-rewards-api/.default",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://login.microsoftonline.com/{{TenantId}}/oauth2/v2.0/token",
+					"protocol": "https",
+					"host": [
+						"login",
+						"microsoftonline",
+						"com"
+					],
+					"path": [
+						"{{TenantId}}",
+						"oauth2",
+						"v2.0",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetRewardItems",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"    //parse the response JSON and test three properties\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson.memberId).to.eql('5454A');    \r",
+							"    pm.expect(responseJson.points.length).to.be.above(0);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "{{SubscriptionKey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{StackName}}.azure-api.net/rewards/5454A/points/year/2014",
+					"protocol": "https",
+					"host": [
+						"{{StackName}}",
+						"azure-api",
+						"net"
+					],
+					"path": [
+						"rewards",
+						"5454A",
+						"points",
+						"year",
+						"2014"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

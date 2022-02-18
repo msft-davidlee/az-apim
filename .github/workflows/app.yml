@@ -37,6 +37,8 @@ jobs:
     name: Build, Deploy Environment Job
     needs: setup
     environment: ${{ needs.setup.outputs.build_env }}
+    env:
+      postmanVarFilePath: ${{ github.workspace }}\environment.json
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -44,13 +46,13 @@ jobs:
       - name: Azure CLI Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.MS_AZURE_CREDENTIALS }}
           enable-AzPSSession: true
 
-      - name: Setup .NET Core SDK 3.1.x
+      - name: Setup .NET 6
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "3.1.x"          
+          dotnet-version: '6.0.x'      
 
       - id: buildenvironment
         name: Build Azure environment
@@ -59,7 +61,28 @@ jobs:
             -RESOURCE_GROUP ${{ secrets.RESOURCE_GROUP }} `
             -PREFIX ${{ secrets.PREFIX }} `
             -GITHUB_REF ${{ github.ref }} `
+            -RUN_NUMBER ${{ github.run_number }} `
             -JWT_CONFIG_APP_ID ${{ secrets.JWT_CONFIG_APP_ID }} `
             -JWT_CONFIG_TENANT_ID ${{ secrets.JWT_CONFIG_TENANT_ID }} `
             -PUBLISHER_EMAIL ${{ secrets.PUBLISHER_EMAIL }} `
             -PUBLISHER_NAME "${{ secrets.PUBLISHER_NAME }}"
+
+      - name: Setup API Testing
+        uses: azure/powershell@v1        
+        with:
+          inlineScript: |
+            .\Deployment\SetupPostmanTest.ps1 -RESOURCE_GROUP ${{ secrets.RESOURCE_GROUP }} `
+              -StackName ${{ steps.buildenvironment.outputs.stackName }} `
+              -JWT_CONFIG_APP_ID ${{ secrets.JWT_CONFIG_APP_ID }} `
+              -JWT_CONFIG_APP_SECRET ${{ secrets.JWT_CONFIG_APP_SECRET }} `
+              -JWT_CONFIG_TENANT_ID ${{ secrets.JWT_CONFIG_TENANT_ID }} `
+              -FilePath ${{ env.postmanVarFilePath }}
+          azPSVersion: "latest"            
+
+      - name: Run API Tests
+        id: run-newman
+        uses: anthonyvscode/newman-action@v1
+        with:
+          collection: Test\APIM-Managed.postman_collection.json
+          environment: ${{ env.postmanVarFilePath }}
+          reporters: cli        

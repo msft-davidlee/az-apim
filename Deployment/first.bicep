@@ -1,13 +1,15 @@
 param prefix string
-param appEnvironment string
+param stackEnvironment string
 param branch string
-param location string = resourceGroup().location
+param version string
+param location string = 'centralus'
 
-var stackName = '${prefix}${appEnvironment}'
+var stackName = '${prefix}${stackEnvironment}'
 var tags = {
   'stack-name': stackName
-  'environment': appEnvironment
-  'branch': branch
+  'stack-version': version
+  'stack-environment': stackEnvironment
+  'stack-branch': branch
 }
 
 resource appinsights 'Microsoft.Insights/components@2020-02-02' = {
@@ -89,7 +91,7 @@ resource apifuncapp 'Microsoft.Web/sites@2020-12-01' = {
         }
         {
           'name': 'FUNCTIONS_EXTENSION_VERSION'
-          'value': '~3'
+          'value': '~4'
         }
         {
           'name': 'ApplicationInsightsAgent_EXTENSION_VERSION'
