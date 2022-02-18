@@ -3,7 +3,8 @@ param(
     [string]$JWT_CONFIG_APP_ID,
     [string]$JWT_CONFIG_APP_SECRET,
     [string]$JWT_CONFIG_TENANT_ID,
-    [string]$StackName)
+    [string]$StackName,
+    [string]$FilePath)
 
 # ClientId= =${{ secrets.JWT_CONFIG_APP_SECRET }} TenantId=${{ secrets.JWT_CONFIG_TENANT_ID }} SubscriptionKey=${{ steps.getsubscriptionkey.outputs.subscriptionKey }} StackName=${{ steps.buildenvironment.outputs.stackName }}
 $apimContext = New-AzApiManagementContext -ResourceGroupName $RESOURCE_GROUP -ServiceName $StackName
@@ -17,4 +18,4 @@ $obj = @{ "name" = "vars"; values = @(
         @{ name = "SubscriptionKey"; value = $subscriptionKey; }; 
         @{ name = "StackName"; value = $StackName; }; ) 
 }
-$obj | ConvertTo-Json | Out-File environment.json -Encoding ASCII
+$obj | ConvertTo-Json | Out-File $FilePath -Encoding ASCII

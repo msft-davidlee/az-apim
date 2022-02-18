@@ -37,6 +37,8 @@ jobs:
     name: Build, Deploy Environment Job
     needs: setup
     environment: ${{ needs.setup.outputs.build_env }}
+    env:
+      postmanVarFilePath: ${{ github.workspace }}\environment.json
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -74,7 +76,8 @@ jobs:
               -StackName ${{ steps.buildenvironment.outputs.stackName }} `
               -JWT_CONFIG_APP_ID ${{ secrets.JWT_CONFIG_APP_ID }} `
               -JWT_CONFIG_APP_SECRET ${{ secrets.JWT_CONFIG_APP_SECRET }} `
-              -JWT_CONFIG_TENANT_ID ${{ secrets.JWT_CONFIG_TENANT_ID }}
+              -JWT_CONFIG_TENANT_ID ${{ secrets.JWT_CONFIG_TENANT_ID }} `
+              -FilePath $postmanVarFilePath
           azPSVersion: "latest"            
 
       - name: Run API Tests
@@ -82,7 +85,7 @@ jobs:
         uses: anthonyvscode/newman-action@v1
         with:
           collection: Test\APIM-Managed.postman_collection.json
-          environment: environment.json
+          environment: $postmanVarFilePath
           reporters: cli
 
       - name: Output summary to console
