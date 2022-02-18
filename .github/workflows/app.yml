@@ -67,9 +67,8 @@ jobs:
             -PUBLISHER_EMAIL ${{ secrets.PUBLISHER_EMAIL }} `
             -PUBLISHER_NAME "${{ secrets.PUBLISHER_NAME }}"
 
-      - name: Create
-        uses: azure/powershell@v1
-        id: getsubscriptionkey
+      - name: Setup API Testing
+        uses: azure/powershell@v1        
         with:
           inlineScript: |
             .\Deployment\SetupPostmanTest.ps1 -RESOURCE_GROUP ${{ secrets.RESOURCE_GROUP }} `
