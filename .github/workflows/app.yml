@@ -77,7 +77,7 @@ jobs:
               -JWT_CONFIG_APP_ID ${{ secrets.JWT_CONFIG_APP_ID }} `
               -JWT_CONFIG_APP_SECRET ${{ secrets.JWT_CONFIG_APP_SECRET }} `
               -JWT_CONFIG_TENANT_ID ${{ secrets.JWT_CONFIG_TENANT_ID }} `
-              -FilePath $postmanVarFilePath
+              -FilePath ${{ env.postmanVarFilePath }}
           azPSVersion: "latest"            
 
       - name: Run API Tests
@@ -85,7 +85,7 @@ jobs:
         uses: anthonyvscode/newman-action@v1
         with:
           collection: Test\APIM-Managed.postman_collection.json
-          environment: $postmanVarFilePath
+          environment: ${{ env.postmanVarFilePath }}
           reporters: cli
 
       - name: Output summary to console
